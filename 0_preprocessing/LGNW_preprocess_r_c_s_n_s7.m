@@ -8,25 +8,23 @@
 spm('defaults', 'FMRI');
 spm_jobman('initcfg');
 
-% array of subjects (null to prevent the last subject from being run twice, which has been an issue)
+% Array of subjects
 subjects = [...
     "d1" "d2" "d3" "d4" "d5" "d6" "d7" "d8" "d9" "d10" "d11" "d12" "d13" "d14" ...
     "d15" "d16" "d17" "d18" "d19" "d20" "d21" "d22" "d23" "d24" "d25" "d26" "d27" "d28" ...
-    "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" "h10" "h11" "h12" "h13" "h14" "NULL"];
+    "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" "h10" "h11" "h12" "h13" "h14"];
 
-for i = 1:numel(subjects)
+for subject_idx = 1:length(subjects)
+    subject = char(subjects(subject_idx));
+    disp(['Processing subject ' subject]);
 
-    subject = subjects(i);
-    subject_cell = {char(subject)}; % convert to cell array of character vectors
-
-    disp(subject);
     % Step 1: Select runs and remove first 4 dummy volumes
     matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.name = 'funcRuns';
         matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files = {
-            {['/Volumes/BTCruiser/READ/data/' subject_cell{1} '/orig/processed/' subject_cell{1} '_fs1.nii']}
-            {['/Volumes/BTCruiser/READ/data/' subject_cell{1} '/orig/processed/' subject_cell{1} '_fs2.nii']}
-            {['/Volumes/BTCruiser/READ/data/' subject_cell{1} '/orig/processed/' subject_cell{1} '_print1.nii']}
-            {['/Volumes/BTCruiser/READ/data/' subject_cell{1} '/orig/processed/' subject_cell{1} '_print2.nii']}
+            {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_fs1.nii']}
+            {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_fs2.nii']}
+            {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_print1.nii']}
+            {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_print2.nii']}
         };
     for sess = 1:4  % For each of 4 sessions, remove the first 4 dummy volumes
         V = spm_vol(char(matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files{sess}));
@@ -35,7 +33,7 @@ for i = 1:numel(subjects)
         
         % Get the filename and path
         [filepath, filename, ext] = fileparts(V(1).fname);
-        new_filename = fullfile(filepath, ['t' filename ext]);
+        new_filename = fullfile(filepath, ['t' filename ext]); % Add 't' prefix to filename
         
         % Copy header info for remaining volumes to new file
         spm_file_merge(char({V(5:end).fname}), new_filename);
@@ -80,7 +78,7 @@ for i = 1:numel(subjects)
     
     % Step 3: Coregister anatomical image to realigned functional images. 
     matlabbatch{3}.spm.spatial.coreg.estwrite.ref(1) = cfg_dep('Realign: Estimate & Reslice: Mean Image', substruct('.','val', '{}',{2}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','rmean'));
-    matlabbatch{3}.spm.spatial.coreg.estwrite.source = {['/Volumes/BTCruiser/READ/data/' subject_cell{1} '/orig/processed/' subject_cell{1} '_anat.nii,1']};
+    matlabbatch{3}.spm.spatial.coreg.estwrite.source = {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_anat.nii,1']};
     matlabbatch{3}.spm.spatial.coreg.estwrite.other = {''};
     matlabbatch{3}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
     matlabbatch{3}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];
@@ -180,7 +178,6 @@ for i = 1:numel(subjects)
     matlabbatch{6}.spm.spatial.smooth.prefix = 's7';
 
     % Once matlabbatch is fully configured for the current subject, run it
-    spm('defaults', 'FMRI');
     spm_jobman('run', matlabbatch);
 
     % Clear matlabbatch for the next iteration

@@ -6,14 +6,14 @@ disp(['Processing subject ' subject]);
 % Step 1: Choose files
 matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.name = 's4war_runs';
 matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files = {
-                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s4war' subject '_print1.nii']}
-                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s4war' subject '_print2.nii']}
-                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s4war' subject '_fs1.nii']}
-                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s4war' subject '_fs2.nii']}
+                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s7wart' subject '_print1.nii']}
+                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s7wart' subject '_print2.nii']}
+                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s7wart' subject '_fs1.nii']}
+                                                                     {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/s7wart' subject '_fs2.nii']}
                                                                      }';
 
 % Step 2: Specify first-level model
-matlabbatch{2}.spm.stats.fmri_spec.dir = {['/Volumes/BTShack/LGNW/data/' subject '/stats/uni_4fwhm']};
+matlabbatch{2}.spm.stats.fmri_spec.dir = {['/Volumes/BTShack/LGNW/data/' subject '/stats/uni_7fwhm']};
 matlabbatch{2}.spm.stats.fmri_spec.timing.units = 'secs';
 matlabbatch{2}.spm.stats.fmri_spec.timing.RT = 2;
 matlabbatch{2}.spm.stats.fmri_spec.timing.fmri_t = 16;
