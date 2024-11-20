@@ -18,7 +18,7 @@ for subject_idx = 1:length(subjects)
     subject = char(subjects(subject_idx));
     disp(['Processing subject ' subject]);
 
-    % Step 1: Select runs and remove first 4 dummy volumes
+    % Step 1: Select runs.
     matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.name = 'funcRuns';
         matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files = {
             {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_fs1.nii']}
@@ -26,21 +26,7 @@ for subject_idx = 1:length(subjects)
             {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_print1.nii']}
             {['/Volumes/BTShack/LGNW/data/' subject '/orig/processed/' subject '_print2.nii']}
         };
-    for sess = 1:4  % For each of 4 sessions, remove the first 4 dummy volumes
-        V = spm_vol(char(matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files{sess}));
-        num_vols = length(V);
-        new_file = V(5:num_vols);  % Skip first 4 volumes
-        
-        % Get the filename and path
-        [filepath, filename, ext] = fileparts(V(1).fname);
-        new_filename = fullfile(filepath, ['t' filename ext]); % Add 't' prefix to filename
-        
-        % Copy header info for remaining volumes to new file
-        spm_file_merge(char({V(5:end).fname}), new_filename);
-        
-        % Update the file list for subsequent processing
-        matlabbatch{1}.cfg_basicio.file_dir.file_ops.cfg_named_file.files{sess} = {new_filename};
-    end
+
     % Step 2: Realign functional images with each other. (prefix = r*)
     matlabbatch{2}.spm.spatial.realign.estwrite.data{1}(1) = cfg_dep('Named File Selector: funcRuns(1) - Files', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files', '{}',{1}));
     matlabbatch{2}.spm.spatial.realign.estwrite.data{2}(1) = cfg_dep('Named File Selector: funcRuns(2) - Files', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files', '{}',{2}));
